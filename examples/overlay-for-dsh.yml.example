@@ -1,0 +1,12 @@
+# dsh 官方桥接方式接入 doctrove（与 bundle 内置桥接二选一，不要同时启用）。
+# 用法：把这段插入 $DSH_HOME/profiles/<profile>/cordis.patch.yml（或用 dsh --patch 加载）。
+- insert:
+    - id: mcp-doctrove
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: doctrove
+        transport: stdio
+        command: node
+        args: ['/绝对路径/src/entry.js']
+        env:
+          DOCTROVE_INDEX_URL: !!js process.env.DOCTROVE_INDEX_URL ?? ''

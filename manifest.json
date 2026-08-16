@@ -1,0 +1,49 @@
+{
+  "name": "doctrove",
+  "version": "1.0.0",
+  "description": "版本化库文档检索：为 agent 提供文档目录检索、版本选择与按主题提取文档片段的能力，防止凭记忆产生幻觉用法",
+  "kind": "mcp-stdio",
+  "entry": "src/entry.js",
+  "runtime": {
+    "engine": "node",
+    "version": ">=18.17",
+    "dependencies": "none（零运行时依赖）"
+  },
+  "transport": {
+    "type": "stdio",
+    "framing": "按行分隔的 JSON-RPC 2.0 消息",
+    "protocol": "Model Context Protocol（initialize / tools/list / tools/call / ping）",
+    "protocolVersions": ["2025-06-18", "2025-03-26", "2024-11-05"]
+  },
+  "capabilities": ["tools"],
+  "tools": [
+    { "name": "catalog_lookup", "mutating": false, "description": "按名称/描述检索文档目录，返回带评分排序的匹配条目" },
+    { "name": "catalog_releases", "mutating": false, "description": "列出条目的可用版本与推荐版本" },
+    { "name": "doc_extract", "mutating": false, "description": "按条目、版本与主题提取文档片段（相关度排序）" }
+  ],
+  "config": {
+    "configFile": "doctrove.config.json（由 --config / DOCTROVE_CONFIG 指定）",
+    "envVars": [
+      "DOCTROVE_INDEX_URL（远程索引地址；未配置时使用内置本地索引）",
+      "DOCTROVE_LOCAL_INDEX（本地索引文件路径，默认内置 data/index.json）",
+      "DOCTROVE_CACHE_TTL（缓存秒数，0 关闭，默认 600）",
+      "DOCTROVE_TIMEOUT_MS（远程请求超时，默认 15000）",
+      "DOCTROVE_CONFIG",
+      "DOCTROVE_DEBUG"
+    ],
+    "flags": ["--index-url", "--local-index", "--cache-ttl", "--no-cache", "--timeout-ms", "--debug", "--version", "--help", "--config"]
+  },
+  "integration": {
+    "dsh": {
+      "mechanism": "bundle（package.json 的 dsh.bundle.patch 指向 cordis.patch.yml）",
+      "loading": "dsh 把 bundle 的 patch 行并入配置树；'doctrove/bridge' 插件在 harness 进程内 spawn 本 server，握手后把工具注册到 ctx.tools",
+      "toolNames": "mcp__doctrove__<工具名>",
+      "officialAlternative": "使用 @deepseek-ai/dsh-mcp-client 配置行直接连接本 server"
+    },
+    "genericMcpClient": {
+      "command": "node",
+      "args": ["<本目录>/src/entry.js"],
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,17 @@
+# doctrove 的 dsh 接入层。
+# 本 bundle 被安装进 profile 后，这一行会把 doctrove 的 MCP server
+# 以子进程方式拉起，并把全部工具注册进 dsh 的工具注册表，
+# 模型侧工具名为 mcp__doctrove__<工具名>（例如 mcp__doctrove__doc_extract）。
+#
+# 默认行为：不配置远程索引时使用内置本地索引，完全离线可用。
+# 需要接入远程文档索引时，取消注释并填写 index-url：
+- insert:
+    - id: doctrove-mcp
+      name: 'doctrove/bridge'
+      config:
+        serverName: doctrove
+        # 透传给 server 的启动参数（可选；--index-url 传 index.json 所在目录的 URL）：
+        # args: ['--index-url', 'https://docs.example.com']
+        # 追加到子进程环境的变量（可选；不填则继承宿主环境）：
+        # env:
+        #   DOCTROVE_INDEX_URL: 'https://docs.example.com/index'

@@ -1,0 +1,264 @@
+{
+  "format": "doctrove-index@1",
+  "updatedAt": "2026-08-16T00:00:00.000Z",
+  "entries": [
+    {
+      "id": "express",
+      "name": "Express",
+      "summary": "Node.js 极简 Web 应用框架",
+      "aliases": ["expressjs"],
+      "homepage": "https://expressjs.com",
+      "popularity": 1200,
+      "versions": ["5.1.0", "4.21.2"],
+      "volumes": {
+        "5.1.0": {
+          "summary": "Express 5 要点：异步错误自动转发、path-to-regexp v8 通配符语法、不再捆绑视图引擎。",
+          "sections": [
+            {
+              "heading": "路由处理器",
+              "path": "https://expressjs.com/en/5x/api.html#app.METHOD",
+              "body": "app.get('/user/:id', (req, res) => res.send(req.params.id))。path 支持字符串、:name 参数、正则与命名通配符。Express 5 中处理器返回的 Promise 若被拒绝（async 处理器内 throw），错误自动转发给错误中间件，无需手写 next(err)。"
+            },
+            {
+              "heading": "通配符路由",
+              "path": "https://expressjs.com/en/5x/api.html#app.use",
+              "body": "Express 5 采用 path-to-regexp v8：裸 * 不再合法，必须使用命名通配符，如 app.get('/files/*splat', ...)，匹配值在 req.params.splat。旧式 '*' 写法会直接抛错，迁移时需改写。"
+            },
+            {
+              "heading": "请求对象 req",
+              "path": "https://expressjs.com/en/5x/api.html#req",
+              "body": "req.params 取路由参数（:id）；req.query 取查询字符串（由 qs 解析为对象）；req.body 需要先挂载 express.json() 等 body 解析中间件；req.headers 键一律小写；req.path 为当前路径，req.ip 为客户端地址。"
+            },
+            {
+              "heading": "响应对象 res",
+              "path": "https://expressjs.com/en/5x/api.html#res",
+              "body": "res.status(201).send(body) 链式组合；res.json(obj) 输出 JSON（Content-Type: application/json）；res.redirect('/login')；res.sendFile('/abs/path')；res.end() 结束无响应体的请求。"
+            },
+            {
+              "heading": "中间件",
+              "path": "https://expressjs.com/en/guide/using-middleware.html",
+              "body": "app.use([path], fn) 按注册顺序执行；next() 放行到下一个中间件；next(err) 直接跳转到错误中间件。错误中间件必须声明四个参数 (err, req, res, next)，并注册在所有普通中间件与路由之后。"
+            },
+            {
+              "heading": "请求体解析",
+              "path": "https://expressjs.com/en/5x/api.html#express.json",
+              "body": "app.use(express.json()) 解析 JSON body；app.use(express.urlencoded({ extended: true })) 解析表单。解析结果写入 req.body。解析失败会抛出 400 类错误并进入错误中间件。"
+            },
+            {
+              "heading": "静态资源",
+              "path": "https://expressjs.com/en/starter/static-files.html",
+              "body": "app.use(express.static('public')) 把 public 目录暴露为静态资源，配合 app.use('/assets', express.static('public/assets')) 可以挂载到子路径。"
+            },
+            {
+              "heading": "模板渲染",
+              "path": "https://expressjs.com/en/guide/using-template-engines.html",
+              "body": "Express 5 不再捆绑任何视图引擎：先 npm 安装 ejs 等引擎，再 app.set('view engine', 'ejs')，处理器里 res.render('page', { data }) 渲染。渲染失败同样进入错误中间件。"
+            },
+            {
+              "heading": "启动与端口",
+              "path": "https://expressjs.com/en/starter/hello-world.html",
+              "body": "const app = express(); app.listen(port, () => console.log('listening'))。惯例：const port = process.env.PORT || 3000，便于平台注入端口。app.set('trust proxy', true) 可让 req.ip 识别反向代理后的真实客户端地址。"
+            }
+          ]
+        },
+        "4.21.2": {
+          "summary": "Express 4 要点：稳定、生态最大；异步错误需手动 next(err)。",
+          "sections": [
+            {
+              "heading": "路由处理器",
+              "path": "https://expressjs.com/en/4x/api.html#app.METHOD",
+              "body": "app.get('/user/:id', handler) 基础路由；路径支持字符串与正则。Express 4 不自动捕获异步处理器中的异常：async 处理器内必须 try/catch 并 next(err)，否则错误会静默丢失。"
+            },
+            {
+              "heading": "通配符路由",
+              "path": "https://expressjs.com/en/4x/api.html#app.use",
+              "body": "Express 4 中 * 可作通配段：app.get('/files/*', ...) 匹配任意深度路径，匹配值在 req.params[0]。"
+            },
+            {
+              "heading": "请求对象 req",
+              "path": "https://expressjs.com/en/4x/api.html#req",
+              "body": "req.params 取路由参数；req.query 取查询字符串（qs 解析）；req.body 需要 body-parser 类中间件（express.json() 从 4.16 起内建）；req.headers 键小写。"
+            },
+            {
+              "heading": "响应对象 res",
+              "path": "https://expressjs.com/en/4x/api.html#res",
+              "body": "res.status(404).send('not found')；res.json(obj)；res.redirect(url)；res.sendFile(path)；res.render(view, data) 配合已注册的视图引擎。"
+            },
+            {
+              "heading": "中间件与错误处理",
+              "path": "https://expressjs.com/en/guide/error-handling.html",
+              "body": "app.use 按序执行；错误中间件四参数签名 (err, req, res, next)。同步 throw 会被捕获并进入错误中间件；异步错误必须手动 next(err)。默认错误处理器返回 500。"
+            },
+            {
+              "heading": "请求体解析",
+              "path": "https://expressjs.com/en/4x/api.html#express.json",
+              "body": "app.use(express.json()) 与 app.use(express.urlencoded({ extended: true })) 分别解析 JSON 与表单 body；body 大小限制可通过 { limit: '1mb' } 配置。"
+            },
+            {
+              "heading": "静态资源",
+              "path": "https://expressjs.com/en/starter/static-files.html",
+              "body": "app.use(express.static('public')) 托管静态目录；可挂子路径：app.use('/static', express.static('public'))。"
+            },
+            {
+              "heading": "启动与端口",
+              "path": "https://expressjs.com/en/starter/hello-world.html",
+              "body": "app.listen(port, cb)；const port = process.env.PORT || 3000；app.set('view engine', 'ejs') 需先安装模板引擎。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "zod",
+      "name": "Zod",
+      "summary": "TypeScript 优先的 schema 声明与校验库",
+      "aliases": ["zodschema"],
+      "homepage": "https://zod.dev",
+      "popularity": 900,
+      "versions": ["3.24.1", "3.23.8"],
+      "volumes": {
+        "3.24.1": {
+          "summary": "Zod v3 稳定线：对象校验、类型推导、transform 与 error 定制。",
+          "sections": [
+            {
+              "heading": "基础 schema",
+              "path": "https://zod.dev/api#primitives",
+              "body": "z.string()、z.number()、z.boolean()、z.bigint()、z.date()；字面量 z.literal('on')；枚举 z.enum(['a','b'])；TS 枚举 z.nativeEnum(MyEnum)。"
+            },
+            {
+              "heading": "对象与校验执行",
+              "path": "https://zod.dev/api#parse",
+              "body": "const s = z.object({ name: z.string().min(1) })。s.parse(data) 通过时返回数据，失败抛 ZodError；s.safeParse(data) 永不抛错，返回 { success: true, data } 或 { success: false, error }，生产代码推荐 safeParse。"
+            },
+            {
+              "heading": "类型推导",
+              "path": "https://zod.dev/api#type-inference",
+              "body": "z.infer<typeof schema> 把 schema 推导为 TS 类型；z.output<typeof schema> 与 z.input<typeof schema> 可分别取转换前后的类型。"
+            },
+            {
+              "heading": "可选与默认值",
+              "path": "https://zod.dev/api#optional",
+              "body": "z.string().optional() 允许 undefined；.nullable() 允许 null；.nullish() 两者皆可；.default('x') 在缺省时填充默认值（默认值会参与输出类型）。"
+            },
+            {
+              "heading": "数组与集合",
+              "path": "https://zod.dev/api#array",
+              "body": "z.array(z.number())；z.tuple([z.string(), z.number()])；z.record(z.string(), z.number()) 键值对象；z.set(z.number()) 去重集合。"
+            },
+            {
+              "heading": "字符串格式与长度",
+              "path": "https://zod.dev/api#string-validation",
+              "body": "z.string().email()、.url()、.uuid()、.datetime()、.regex(/^[a-z]+$/)；长度约束 .min(3, '至少 3 个字符')、.max(10)。"
+            },
+            {
+              "heading": "转换",
+              "path": "https://zod.dev/api#transform",
+              "body": "z.coerce.number() 把字符串 '42' 强转为 42；z.string().transform(v => v.toUpperCase()) 在校验后转换；preprocess 可在校验前预处理输入。"
+            },
+            {
+              "heading": "条件与联合校验",
+              "path": "https://zod.dev/api#refine",
+              "body": "z.string().refine(v => v.length % 2 === 0, '长度须为偶数')；z.union([a, b]) 多选一；z.discriminatedUnion('kind', [a, b]) 按判别字段做性能更好的联合校验；复杂逻辑用 .superRefine((v, ctx) => ctx.addIssue(...))。"
+            },
+            {
+              "heading": "错误信息定制",
+              "path": "https://zod.dev/api#customizing-errors",
+              "body": "z.string({ error: '请输入字符串' })、z.string().min(1, { message: '不能为空' }) 或简写 .min(1, '不能为空')；z.ZodError.issues 数组给出每条错误路径与信息，可用 error.issues 渲染到表单。"
+            }
+          ]
+        },
+        "3.23.8": {
+          "summary": "Zod 3.23 维护线（3.24 之前）。",
+          "sections": [
+            {
+              "heading": "基础用法",
+              "path": "https://zod.dev/api#basics",
+              "body": "z.object({ name: z.string() })；.parse/.safeParse 与 3.24 一致；z.infer<typeof schema> 推导类型。"
+            },
+            {
+              "heading": "校验与错误",
+              "path": "https://zod.dev/api#errors",
+              "body": "safeParse 返回 { success, data|error }；error.issues 数组包含 path 与 message。"
+            },
+            {
+              "heading": "与 3.24 的差异",
+              "path": "https://zod.dev/changelog",
+              "body": "3.24 主要是错误信息模板（custom message 支持 {path} 占位）与内部重构，公开 API 基本兼容；新项目建议直接使用 3.24+。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dayjs",
+      "name": "Day.js",
+      "summary": "轻量级 JavaScript 日期处理库（2kB，API 兼容 Moment.js）",
+      "aliases": ["dayjsjs"],
+      "homepage": "https://day.js.org",
+      "popularity": 800,
+      "versions": ["1.11.13", "1.11.10"],
+      "volumes": {
+        "1.11.13": {
+          "summary": "Day.js 1.11 稳定线：不可变链式 API、插件化、多语言。",
+          "sections": [
+            {
+              "heading": "解析",
+              "path": "https://day.js.org/docs/en/parse/parse",
+              "body": "dayjs() 当前时间；dayjs('2024-01-01') 解析 ISO 串；dayjs(1700000000000) 解析毫秒时间戳；dayjs(new Date()) 包装 Date 对象。解析失败得到 Invalid Date，用 dayjs().isValid() 判断。"
+            },
+            {
+              "heading": "格式化",
+              "path": "https://day.js.org/docs/en/display/format",
+              "body": "dayjs('2024-01-02').format('YYYY-MM-DD') → '2024-01-02'；令牌：YYYY 年、MM 月、DD 日、HH 时、mm 分、ss 秒、ddd 星期缩写；不带参数返回 ISO 8601 串。"
+            },
+            {
+              "heading": "增减与区间",
+              "path": "https://day.js.org/docs/en/manipulate/add",
+              "body": "dayjs().add(7, 'day')、dayjs().subtract(1, 'month') 返回新实例（不可变）；单位 day/week/month/year/hour/minute/second/ms；startOf('month') / endOf('week') 取区间边界。"
+            },
+            {
+              "heading": "比较",
+              "path": "https://day.js.org/docs/en/query/is-before",
+              "body": "a.diff(b, 'day') 相差天数（可小数，负数为 b 在前）；a.isBefore(b)、a.isAfter(b)、a.isSame(b, 'year')；a.isBetween(b, c)（isBetween 插件）。"
+            },
+            {
+              "heading": "展示",
+              "path": "https://day.js.org/docs/en/display/from-now",
+              "body": "dayjs().fromNow() 相对时间（'3 天前'，需 relativeTime 插件）；dayjs().toISOString()；.unix() 秒级时间戳；.valueOf() 毫秒时间戳；.format('YYYY-MM-DDTHH:mm:ssZ') 自定义偏移。"
+            },
+            {
+              "heading": "插件",
+              "path": "https://day.js.org/docs/en/plugin/plugin",
+              "body": "import relativeTime from 'dayjs/plugin/relativeTime'; dayjs.extend(relativeTime)。常用：utc、timezone（配合 tz 数据）、isBetween、isSameOrBefore、customParseFormat。"
+            },
+            {
+              "heading": "语言",
+              "path": "https://day.js.org/docs/en/i18n/loading-into-browser",
+              "body": "import 'dayjs/locale/zh-cn'; dayjs.locale('zh-cn') 切换全局语言；dayjs(date).locale('en') 单实例语言。中文下 fromNow 输出 '3 天前'。"
+            }
+          ]
+        },
+        "1.11.10": {
+          "summary": "Day.js 1.11 早期维护线，API 与 1.11.13 一致。",
+          "sections": [
+            {
+              "heading": "解析与格式化",
+              "path": "https://day.js.org/docs/en/parse/parse",
+              "body": "dayjs(str|ts|Date) 解析；.format('YYYY-MM-DD') 格式化；isValid() 校验。"
+            },
+            {
+              "heading": "链式操作",
+              "path": "https://day.js.org/docs/en/manipulate/add",
+              "body": ".add/.subtract/.startOf/.endOf 链式组合，每次返回新实例（不可变）。"
+            },
+            {
+              "heading": "插件与语言",
+              "path": "https://day.js.org/docs/en/plugin/plugin",
+              "body": "dayjs.extend(...) 加载插件（relativeTime/utc/customParseFormat 等）；dayjs.locale('zh-cn') 切语言。"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "indexUrl": "http://localhost:8730",
+  "localIndex": "./data/index.json",
+  "cacheTtl": 600,
+  "timeoutMs": 15000,
+  "debug": false
+}
