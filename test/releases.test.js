@@ -108,3 +108,20 @@ test('selectRelease：无前缀命中时抛 VERSION 错误并带候选', () => {
 test('selectRelease：空版本列表视为索引损坏', () => {
   assert.throws(() => selectRelease('latest', []), (err) => err.code === 'version')
 })
+
+test('版本边界：大写 X 模式、前导零前缀与不等长数值段', () => {
+  // 大写 X 与 x/* 等价
+  assert.equal(selectRelease('5.1.X', VERSIONS).version, '5.1.0')
+  assert.equal(selectRelease('5.X', VERSIONS).version, '5.1.0')
+  assert.equal(selectRelease('V5.1.*', VERSIONS).version, '5.1.0')
+  // 前导零的精确串不在列表 → 走前缀路径（'04' → 4.x）
+  assert.equal(selectRelease('04', VERSIONS).version, '4.21.2')
+  assert.equal(selectRelease('04.20', VERSIONS).version, '4.20.0')
+  // 数值段等值但长度不同视为同一版本
+  assert.equal(compareVersions('5.1', '5.1.0'), 0)
+  assert.equal(compareVersions('v5', '5.0.0'), 0)
+  assert.deepEqual(parseVersion('v5').parts, [5])
+  // 预发布与正式版之间取正式版；全部预发布时取最新预发布
+  assert.equal(selectRelease('5.0', [...VERSIONS, '5.0.0-beta.2']).version, '5.0.1')
+  assert.equal(pickLatest(['1.0.0-rc.1', '1.0.0-beta.1']), '1.0.0-rc.1')
+})
