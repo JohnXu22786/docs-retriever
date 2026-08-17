@@ -313,3 +313,33 @@ test('远程源失败冷却：冷却期内不发起请求，冷却后自动重�
   assert.equal(ok.cached, false)
   assert.equal(fetchCalls, 2)
 })
+
+test('远程源失败冷却：主缓存 TTL 短于冷却期时冷却仍完整生效', async () => {
+  // 主缓存 TTL（10ms）远短于冷却期（250ms）：若冷却条目与负载共用存储，
+  // 它会在冷却结束前被 TTL 淘汰，导致每个查询都重复发起网络请求。
+  const cache = new TtlCache({ ttlMs: 10 })
+  let down = true
+  let fetchCalls = 0
+  const fetchImpl = async () => {
+    fetchCalls += 1
+    if (down) throw new Error('connection refused')
+    return { ok: true, status: 200, json: async () => sampleIndex() }
+  }
+  const source = fakeRemoteSource({
+    baseUrl: 'https://shortttl.example.com', fetchImpl, cache, failCooldownMs: 250,
+  })
+  await assert.rejects(() => source.load(), (err) => err.code === 'network')
+  // 冷却期内（约 100ms 真实耗时）的多次请求都不应触网
+  // （主缓存 TTL 10ms 早已过期，冷却判定必须独立于它）
+  await new Promise((r) => setTimeout(r, 40))
+  await assert.rejects(() => source.load(), (err) => /冷却期/.test(err.message))
+  await new Promise((r) => setTimeout(r, 40))
+  await assert.rejects(() => source.load(), (err) => /冷却期/.test(err.message))
+  assert.equal(fetchCalls, 1)
+  // 越过冷却期：恢复后自动重试成功
+  down = false
+  await new Promise((r) => setTimeout(r, 300))
+  const ok = await source.load()
+  assert.equal(ok.cached, false)
+  assert.equal(fetchCalls, 2)
+})
