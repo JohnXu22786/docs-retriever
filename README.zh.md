@@ -221,7 +221,8 @@ package.json（dsh.bundle.patch → ./cordis.patch.yml）
 - TTL 可配：`--cache-ttl <sec>`（0–86400，0 = 关闭），`--no-cache` 为关闭的快捷方式；
 - **失败冷却（负缓存）**：远程索引拉取失败后进入 30 秒冷却期，期间直接降级本地、
   不重复发起网络请求（避免宕机时每次查询都干等超时）；冷却期过后自动重试，源恢复即自愈。
-  注意：冷却依赖缓存存储，`--no-cache` / `--cache-ttl 0` 下不生效（此时每次失败都会真实重试）；
+  冷却时长独立于缓存 TTL（`--cache-ttl` 小于冷却期也不会被提前截断）；
+  `--no-cache` / `--cache-ttl 0` 下不生效（此时每次失败都会真实重试）；
 - LRU 按访问序淘汰，缓存统计（命中/未命中/淘汰数）用 `--debug` 在进程退出时输出到 stderr；
 - 本地索引的冷启动零成本（同步读取）；远程索引首次拉取后所有查询命中缓存。
 
@@ -311,7 +312,7 @@ node src/entry.js --index-url http://localhost:8730
 ## 测试
 
 ```bash
-node --test        # 93 个用例：评分/版本/缓存/配置/JSON-RPC/引擎/端到端/索引托管
+node --test        # 99 个用例：评分/版本/缓存/配置/JSON-RPC/引擎/端到端/索引托管
 ```
 
 测试覆盖：评分排序边界（层级不可被流行度反转）、版本选择（latest/精确/前缀/预发布/
@@ -335,7 +336,7 @@ src/
   bridge/             plugin.js（dsh Cordis 插件）、client.js（MCP stdio 客户端）
 data/index.json       内置离线索引（示范数据，可替换）
 scripts/serve-index.mjs  零依赖索引托管脚本
-test/                 93 个测试用例
+test/                 99 个测试用例
 ```
 
 ## 许可

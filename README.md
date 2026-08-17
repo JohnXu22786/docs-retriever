@@ -216,7 +216,8 @@ no match → `version` error with a candidate list attached.
 - TTL is configurable: `--cache-ttl <sec>` (0–86400, 0 = disabled), `--no-cache` is a shortcut for disabled;
 - **Failure cooldown (negative caching)**: after a remote index fetch fails, a 30-second cooldown kicks in during which the plugin falls back to local
   and does not repeat the network request (avoiding a timeout wait on every query while the source is down); after the cooldown it retries automatically and heals itself once the source recovers.
-  Note: cooldown depends on cache storage, so it does not apply under `--no-cache` / `--cache-ttl 0` (every failure then really retries);
+  The cooldown timing is independent of the cache TTL (a `--cache-ttl` shorter than the cooldown does not cut it short);
+  it does not apply under `--no-cache` / `--cache-ttl 0` (every failure then really retries);
 - LRU evicts by access order; cache stats (hits/misses/evictions) are printed to stderr at exit with `--debug`;
 - Local-index cold start is free (synchronous read); after the first remote fetch, all queries hit the cache.
 
@@ -306,7 +307,7 @@ the plugin performs no writes and persists no local state. Empty-string environm
 ## Testing
 
 ```bash
-node --test        # 93 cases: scoring/versions/cache/config/JSON-RPC/engine/e2e/index hosting
+node --test        # 99 cases: scoring/versions/cache/config/JSON-RPC/engine/e2e/index hosting
 ```
 
 Coverage: scoring-ranking boundaries (tier order can never be inverted by popularity), version selection (latest/exact/prefix/prerelease/
@@ -330,7 +331,7 @@ src/
   bridge/             plugin.js (dsh Cordis plugin), client.js (MCP stdio client)
 data/index.json       built-in offline index (demo data, replaceable)
 scripts/serve-index.mjs  zero-dependency index hosting script
-test/                 93 test cases
+test/                 99 test cases
 ```
 
 ## License
