@@ -68,6 +68,24 @@ test('ETag 条件请求返回 304', async () => {
   assert.equal(second.status, 304)
 })
 
+test('HEAD 请求：返回与 GET 一致的头部且不带 body', async () => {
+  const get = await fetch(`http://127.0.0.1:${PORT}/index.json`)
+  const head = await fetch(`http://127.0.0.1:${PORT}/index.json`, { method: 'HEAD' })
+  assert.equal(head.status, 200)
+  assert.equal(head.headers.get('etag'), get.headers.get('etag'))
+  assert.match(head.headers.get('content-type'), /json/)
+  assert.equal(head.headers.get('access-control-allow-origin'), '*')
+  // HEAD 没有 body（fetch 对 HEAD 的 text() 返回空串）
+  assert.equal(await head.text(), '')
+  // HEAD 命中条件请求同样返回 304（不读 body）
+  const notModified = await fetch(`http://127.0.0.1:${PORT}/index.json`, {
+    method: 'HEAD',
+    headers: { 'if-none-match': get.headers.get('etag') },
+  })
+  assert.equal(notModified.status, 304)
+  assert.equal(await notModified.text(), '')
+})
+
 test('目录穿越请求不泄露索引目录外的文件', async () => {
   // 路径在 normalize 阶段被折叠到索引目录内（或拒绝），
   // 因此 403/404 均可接受，但绝不能返回项目根的 package.json 内容

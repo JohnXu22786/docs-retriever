@@ -75,27 +75,28 @@ const server = createServer(async (req, res) => {
     if (!cmpReal.startsWith(cmpRoot)) throw new Error('out of root')
 
     const etag = `"${info.size.toString(16)}-${Math.floor(info.mtimeMs).toString(16)}"`
-
-    if (req.headers['if-none-match'] === etag) {
-      res.writeHead(304, { etag, 'cache-control': 'public, max-age=3600' })
-      res.end()
-      return
-    }
-
-    // 304/HEAD 之后才读 body，条件请求与 HEAD 不做无谓的整文件 IO
-    const body = await readFile(file)
-
     const headers = {
       'content-type': MIME[extname(file)] ?? 'application/octet-stream',
       'cache-control': 'public, max-age=3600',
       etag,
       'access-control-allow-origin': '*',
     }
+
+    // ETag 条件请求：命中 304 即返回，不做整文件 IO
+    if (req.headers['if-none-match'] === etag) {
+      res.writeHead(304, { etag, 'cache-control': 'public, max-age=3600' })
+      res.end()
+      return
+    }
+
+    // HEAD 只回响应头，同样不读 body（与 GET 的头部一致）
     if (req.method === 'HEAD') {
       res.writeHead(200, headers)
       res.end()
       return
     }
+
+    const body = await readFile(file)
     res.writeHead(200, headers)
     res.end(body)
   } catch {
