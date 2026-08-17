@@ -12,6 +12,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { DoctroveError, ErrorCodes } from '../core/errors.js'
+import { TtlCache } from '../vault/ttl.js'
 
 export const INDEX_FORMAT = 'doctrove-index@1'
 
@@ -118,6 +119,12 @@ export class RemoteSource {
     this.fetchImpl = fetchImpl
     this.cacheKey = `remote:${baseUrl}/index.json`
     this.failKey = `remote:${baseUrl}/fail`
+    // 失败冷却负缓存独立于主缓存 TTL：若主缓存 TTL 短于冷却期，
+    // 冷却条目会在冷却结束前被提前淘汰，宕机期间每个查询都会重复
+    // 等待一次网络超时。冷却条目单独存储、TTL 至少为冷却期。
+    this.failCache = cache.enabled
+      ? new TtlCache({ ttlMs: Math.max(failCooldownMs, cache.ttlMs), maxEntries: 4 })
+      : null
   }
 
   /** @returns {Promise<{ index: object, label: string, cached: boolean }>} */
@@ -127,7 +134,7 @@ export class RemoteSource {
       this.log(`远程索引命中缓存（${this.baseUrl}）`)
       return { index: hit, label: `remote:${this.baseUrl}`, cached: true }
     }
-    const cooldown = this.cache.get(this.failKey)
+    const cooldown = this.failCache?.get(this.failKey)
     if (cooldown !== undefined && Date.now() - cooldown.at < this.failCooldownMs) {
       // 负缓存：冷却期内直接抛错，由 CatalogStore 降级到本地，不再发起网络请求。
       // 冷却判断用自身时间戳（failCooldownMs），不受缓存 TTL 影响；
@@ -149,7 +156,7 @@ export class RemoteSource {
         signal: AbortSignal.timeout(this.timeoutMs),
       })
     } catch (err) {
-      this.cache.set(this.failKey, { at: Date.now() })
+      this.failCache?.set(this.failKey, { at: Date.now() })
       if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
         throw new DoctroveError(`拉取远程索引超时（${url}，${this.timeoutMs}ms）`, {
           code: ErrorCodes.TIMEOUT,
@@ -162,14 +169,14 @@ export class RemoteSource {
       })
     }
     if (!response.ok) {
-      this.cache.set(this.failKey, { at: Date.now() })
+      this.failCache?.set(this.failKey, { at: Date.now() })
       throw new DoctroveError(`远程索引返回 HTTP ${response.status}（${url}）`, { code: ErrorCodes.NETWORK })
     }
     let index
     try {
       index = await response.json()
     } catch (err) {
-      this.cache.set(this.failKey, { at: Date.now() })
+      this.failCache?.set(this.failKey, { at: Date.now() })
       throw new DoctroveError(`远程索引响应不是合法 JSON（${url}）：${err?.message ?? err}`, {
         code: ErrorCodes.NETWORK,
         cause: err,
@@ -177,7 +184,7 @@ export class RemoteSource {
     }
     const problem = validateIndex(index)
     if (problem) {
-      this.cache.set(this.failKey, { at: Date.now() })
+      this.failCache?.set(this.failKey, { at: Date.now() })
       throw new DoctroveError(`远程索引校验失败（${url}）：${problem}`, { code: ErrorCodes.NETWORK })
     }
     this.cache.set(this.cacheKey, index)
