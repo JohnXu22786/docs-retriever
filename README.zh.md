@@ -312,7 +312,7 @@ node src/entry.js --index-url http://localhost:8730
 ## 测试
 
 ```bash
-node --test        # 99 个用例：评分/版本/缓存/配置/JSON-RPC/引擎/端到端/索引托管
+node --test        # 105 个用例：评分/版本/缓存/配置/JSON-RPC/引擎/端到端/索引托管
 ```
 
 测试覆盖：评分排序边界（层级不可被流行度反转）、版本选择（latest/精确/前缀/预发布/
@@ -336,7 +336,7 @@ src/
   bridge/             plugin.js（dsh Cordis 插件）、client.js（MCP stdio 客户端）
 data/index.json       内置离线索引（示范数据，可替换）
 scripts/serve-index.mjs  零依赖索引托管脚本
-test/                 99 个测试用例
+test/                 105 个测试用例
 ```
 
 ## 许可

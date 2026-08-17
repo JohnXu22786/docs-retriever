@@ -307,7 +307,7 @@ the plugin performs no writes and persists no local state. Empty-string environm
 ## Testing
 
 ```bash
-node --test        # 99 cases: scoring/versions/cache/config/JSON-RPC/engine/e2e/index hosting
+node --test        # 105 cases: scoring/versions/cache/config/JSON-RPC/engine/e2e/index hosting
 ```
 
 Coverage: scoring-ranking boundaries (tier order can never be inverted by popularity), version selection (latest/exact/prefix/prerelease/
@@ -331,7 +331,7 @@ src/
   bridge/             plugin.js (dsh Cordis plugin), client.js (MCP stdio client)
 data/index.json       built-in offline index (demo data, replaceable)
 scripts/serve-index.mjs  zero-dependency index hosting script
-test/                 99 test cases
+test/                 105 test cases
 ```
 
 ## License
