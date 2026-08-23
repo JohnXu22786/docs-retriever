@@ -1,51 +1,51 @@
-{
-  "name": "doctrove",
-  "version": "1.0.0",
-  "description": "面向编码 agent 的版本化库文档检索：检索文档目录、选择版本、按主题提取带相关度排序的文档片段。以 MCP stdio server 形式运行，零运行时依赖，可被 dsh 等插件化 harness 加载",
-  "type": "module",
-  "main": "src/entry.js",
-  "bin": {
-    "doctrove": "src/entry.js"
-  },
-  "exports": {
-    ".": "./src/entry.js",
-    "./bridge": "./src/bridge/plugin.js",
-    "./client": "./src/bridge/client.js"
-  },
-  "files": [
-    "src",
-    "data",
-    "scripts",
-    "cordis.patch.yml",
-    "manifest.json",
-    "README.md",
-    "LICENSE",
-    "examples"
-  ],
-  "engines": {
-    "node": ">=18.17"
-  },
-  "scripts": {
-    "test": "node --test",
-    "start": "node src/entry.js",
-    "serve-index": "node scripts/serve-index.mjs"
-  },
-  "keywords": [
-    "mcp",
-    "docs",
-    "documentation",
-    "dsh",
-    "plugin",
-    "agent",
-    "tools",
-    "library",
-    "api",
-    "reference"
-  ],
-  "license": "MIT",
-  "dsh": {
-    "bundle": {
-      "patch": "./cordis.patch.yml"
-    }
-  }
+﻿{
+    "name":  "dsh-doctrove",
+    "version":  "1.0.0",
+    "description":  "é¢å‘ç¼–ç  agent çš„ç‰ˆæœ¬åŒ–åº“æ–‡æ¡£æ£€ç´¢ï¼šæ£€ç´¢æ–‡æ¡£ç›®å½•ã€é€‰æ‹©ç‰ˆæœ¬ã€æŒ‰ä¸»é¢˜æå–å¸¦ç›¸å…³åº¦æŽ’åºçš„æ–‡æ¡£ç‰‡æ®µã€‚ä»¥ MCP stdio server å½¢å¼è¿è¡Œï¼Œé›¶è¿è¡Œæ—¶ä¾èµ–ï¼Œå¯è¢« dsh ç­‰æ’ä»¶åŒ– harness åŠ è½½",
+    "type":  "module",
+    "main":  "src/entry.js",
+    "bin":  {
+                "doctrove":  "src/entry.js"
+            },
+    "exports":  {
+                    ".":  "./src/entry.js",
+                    "./bridge":  "./src/bridge/plugin.js",
+                    "./client":  "./src/bridge/client.js"
+                },
+    "files":  [
+                  "src",
+                  "data",
+                  "scripts",
+                  "cordis.patch.yml",
+                  "manifest.json",
+                  "README.md",
+                  "LICENSE",
+                  "examples"
+              ],
+    "engines":  {
+                    "node":  "\u003e=18.17"
+                },
+    "scripts":  {
+                    "test":  "node --test",
+                    "start":  "node src/entry.js",
+                    "serve-index":  "node scripts/serve-index.mjs"
+                },
+    "keywords":  [
+                     "mcp",
+                     "docs",
+                     "documentation",
+                     "dsh",
+                     "plugin",
+                     "agent",
+                     "tools",
+                     "library",
+                     "api",
+                     "reference"
+                 ],
+    "license":  "MIT",
+    "dsh":  {
+                "bundle":  {
+                               "patch":  "./cordis.patch.yml"
+                           }
+            }
 }
